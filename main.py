@@ -57,7 +57,7 @@ quiver_width,quiver_scale,quiver_color,quiver_headwidth=0.0018,200,'black',3    
 alpha2=0.7                               #箭头的透明度，0~1之间
 quiverkey_opt=0                         #是否显示quiverkey
 quiverkey_x,quiverkey_y=0.93,1.01       #quiverkey的相对位置，x和y
-quiverkey_ws,quiverkey_text,quiverkey_size=4,'4m/s',8   #quiverkey的标注风速，标注字体和字体大小
+quiverkey_ws,quiverkey_text,quiverkey_size=4,'4m/s',10   #quiverkey的标注风速，标注字体和字体大小
 #色块图例数据
 label_opt=1                                     #是否采用自定义的色块位置，0表示是，1表示否
 rect_place,rect_more='left',0.2                 #设置空白子图的位置（bottom，top，right，left），数值表示空白多少，相对子图的比例

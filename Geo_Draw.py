@@ -11,7 +11,8 @@ import matplotlib as mpl
 from matplotlib.font_manager import FontProperties
 import Fontprocess
 import numpy as np
-Simsun = FontProperties(fname=".\\font\SimSun.ttf")
+Simsun = FontProperties(fname="./font/SimSun.ttf")
+Times = FontProperties(fname="./font/Times.ttf")
 mpl.rcParams['axes.unicode_minus']=False
 config = {
     "mathtext.fontset":'stix',
@@ -67,8 +68,8 @@ class Figure4wrf():
             gl.ylocator = mticker.FixedLocator(np.arange(b_y, t_y+big_interval_y, big_interval_y))
             gl.xformatter = LONGITUDE_FORMATTER
             gl.yformatter = LATITUDE_FORMATTER
-            gl.xlabel_style = {'size': label_size, "color": label_color, "font": 'Times New Roman'}
-            gl.ylabel_style = {'size': label_size, 'color': label_color, "font": 'Times New Roman'}
+            gl.xlabel_style = {'size': label_size, "color": label_color, "font": Times}
+            gl.ylabel_style = {'size': label_size, 'color': label_color, "font": Times}
             # 下面的用于设置minor刻度，不需要就注释掉
             self.axe.set_xticks(np.arange(l_x, r_x, small_interval_x), crs=ccrs.PlateCarree(), minor=True)
             self.axe.set_yticks(np.arange(b_y, t_y, small_interval_y), crs=ccrs.PlateCarree(), minor=True)
@@ -90,8 +91,8 @@ class Figure4wrf():
             # 自定义给出x轴Locator的位置
             gl.xlocator = mticker.FixedLocator(np.arange(l_x, r_x+big_interval_x, big_interval_x))
             gl.ylocator = mticker.FixedLocator(np.arange(b_y, t_y+big_interval_y, big_interval_y))
-            gl.xlabel_style = {'size': label_size, "color": label_color, "font": 'Times New Roman'}
-            gl.ylabel_style = {'size': label_size, 'color': label_color, "font": 'Times New Roman'}
+            gl.xlabel_style = {'size': label_size, "color": label_color, "font": Times}
+            gl.ylabel_style = {'size': label_size, 'color': label_color, "font": Times}
             # 下面的用于设置minor刻度，不需要就注释掉
             axe_1.set_xticks(np.arange(l_x, r_x, small_interval_x), minor=True)
             axe_1.set_yticks(np.arange(b_y, t_y, small_interval_y), minor=True)
@@ -126,8 +127,12 @@ class Figure4wrf():
                                      width=quiver_width, scale=quiver_scale, color=quiver_color, headwidth=quiver_headwidth,alpha=alpha)
         if quiverkey_opt==0:
             # 绘制矢量箭头的图例
+            self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, Fontprocess.zhSimsun_enTNR(quiverkey_text),
+                               labelpos='E', coordinates='axes', fontproperties={'size': quiverkey_size,'family':'Times New Roman'})
+            '''
             self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, quiverkey_text,
                                labelpos='E', coordinates='axes', fontproperties={'size': quiverkey_size,'family':'Times New Roman'})
+            '''
 
     def colorbar_draw(self,rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,label_size,tick_size,rect_place,rect_more):
         if label_opt==0:
@@ -146,14 +151,14 @@ class Figure4wrf():
             cb.ax.tick_params(labelsize=tick_size)
             #下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
             labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
-            [label.set_fontname('Times New Roman') for label in labels]
+            [label.set_fontproperties(Times) for label in labels]
         if label_opt==1:
             cb = self.fig.colorbar(self.contourf, orientation=hv_opt,spacing='proportional')  # orientation='vertical'
             cb.set_label(Fontprocess.zhSimsun_enTNR(label_text),fontproperties=Simsun,fontsize=label_size)
             cb.ax.tick_params(labelsize=tick_size)
             # 下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
             labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
-            [label.set_fontname('Times New Roman') for label in labels]
+            [label.set_fontproperties(Times) for label in labels]
 
     def adjust_subplot(self,wspace,hspace):
         plt.subplots_adjust(wspace=wspace, hspace=hspace)
