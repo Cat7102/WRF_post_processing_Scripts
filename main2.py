@@ -23,7 +23,7 @@ lake_linewidth,lake_linecolor =         0.8, 'black'    #湖泊的线宽和线�
 coastline_linewidth,coastline_color =   0.8, 'black'    #海岸线的线宽和颜色
 precision=                              '10m'   #精度，10m，50m和110m，要加引号
 #设置图片显示范围
-l_x,r_x,b_y,t_y=    120, 122, 30, 32    #图片显示范围，分别是左右下上
+l_x,r_x,b_y,t_y=    120.5, 122.5, 30.3, 32.3    #图片显示范围，分别是左右下上
 more=               0.1     #图片extent的余量
 geo_opt=            0       #是否绘制地理平面图，0表示是，1表示否
 #网格属性
@@ -33,13 +33,13 @@ small_interval_x,small_interval_y =                 0.1, 0.1            #x和y�
 top_labels,bottom_labels,left_labels,right_labels=  1, 0, 0, 1          #是否隐藏上下左右的坐标，1表示隐藏，0显示
 label_size,label_color =                            8, 'black'          #坐标轴字体大小和颜色
 #读取填充数据
-timestart,timeend,timestep=15,25,1               #设置循环开始的时间，结束的时间和时间步长
-path='D:\Data\wrfout_d03_2016-07-21_00_00_00.nc'     #读取文件的路径
+timestart,timeend,timestep=294,432,2               #设置循环开始的时间，结束的时间和时间步长
+path='E:/wrfout_d03_2016-07-21_00-00-00'     #读取文件的路径
 ncfile=nc.Dataset(path)     #这行别动
 x=getvar(ncfile,'lon')                          #x是经度，y是纬度，也可以自行修改
 y=getvar(ncfile,'lat')
-cmap=cmaps.NCV_rainbow2                         #填色的颜色类型，具体参考colormap
-level=np.arange(25, 37.3, 0.3)                  #填色的最小值，最大值和间隔
+cmap=cmaps.amwg_blueyellowred                         #填色的颜色类型，具体参考colormap
+level=np.arange(0.002, 800, 2)                  #填色的最小值，最大值和间隔
 #设置等高线数据
 level2=np.arange(50, 100, 10)                                   #等高线最小值，最大值和间隔
 contour_color,contour_width,contour_style="white",0.7,"solid"   #等高线颜色，宽度和种类（ 'solid', 'dashed', 'dashdot', 'dotted'）
@@ -57,22 +57,25 @@ label_opt=1                                     #是否采用自定义的色块�
 rect_place,rect_more='left',0.2                 #设置空白子图的位置（bottom，top，right，left），数值表示空白多少，相对子图的比例
 rect1,rect2,rect3,rect4=0.2, 0.1, 0.6, 0.03     #色块图例的位置
 hv_opt='vertical'                               #图例垂直还是水平
-label_text='温度坐标(℃)'                        #图例写什么字
+label_text='no2(ppmv)'                        #图例写什么字
 c_label_size,c_tick_size=8,8                   #标签字体大小,刻度字体大小
 
-
+timelist=Readtime.get_ncfile_time(ncfile,timezone=8)
+print(timelist)
 for i in range(timestart,timeend+1,timestep):
     #数据修改在下面
-    factor=getvar(ncfile,'T2',timeidx=i)           #需要绘制填色的变量
-    factor=factor-273.15
+    factor=getvar(ncfile,'PM10',timeidx=i)[0,:,:]           #需要绘制填色的变量
+    #factor=getvar(ncfile,'T2',timeidx=i)
+    #factor=factor-273.15
     factor2=getvar(ncfile,'rh2',timeidx=i)                         #等高线变量
     ws1=ncfile.variables['U10'][i,:,:]     #箭头图的风速u和v的读取
     ws2=ncfile.variables['V10'][i,:,:]
     #修改一些图纸信息
-    title = str(Readtime.get_ncfile_time(ncfile,timezone=8)[i])  # 每个子图的标题
+    title = str(timelist[i])  # 每个子图的标题
     # 图片保存数据
-    time = str(Readtime.get_ncfile_time(ncfile,timezone=8)[i])  # 读取文件的绘图的时间
-    fig_path = str(time.replace(":", "-")) + '.png'  # 保存的文件名，如果需要自己修改则自行添加
+    time = str(timelist[i])  # 读取文件的绘图的时间
+    print(time)
+    fig_path = str(time.replace(":", "-"))+'pm' + '.png'  # 保存的文件名，如果需要自己修改则自行添加
 
     fig=Figure4wrf(fig_width,fig_height,fig_dpi)
     fig.init_draw(ver_num,hor_num,cur_num,title,title_size,title_y)\
@@ -89,7 +92,7 @@ for i in range(timestart,timeend+1,timestep):
     fig.extent_draw(l_x,r_x,b_y,t_y,more,geo_opt)
     fig.gridline_draw(grid_linewidth,grid_color,grid_type,big_interval_x,big_interval_y,small_interval_x,small_interval_y,top_labels,bottom_labels,left_labels,right_labels,label_size,label_color,geo_opt,l_x,r_x,b_y,t_y)
     fig.contourf_draw(x,y,factor,cmap,level)
-    fig.contour_draw(x,y,factor2,level2,contour_color,contour_width,contour_style,fontsize,fontcolor,fontlabel,fontprecision,alpha)
+    #fig.contour_draw(x,y,factor2,level2,contour_color,contour_width,contour_style,fontsize,fontcolor,fontlabel,fontprecision,alpha)
     fig.quiver_draw(x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha2,geo_opt,quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size)
     fig.colorbar_draw(rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,c_label_size,c_tick_size,rect_place,rect_more)
     fig.save_fig(fig_path)

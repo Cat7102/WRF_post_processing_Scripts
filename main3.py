@@ -33,7 +33,7 @@ top_labels,bottom_labels,left_labels,right_labels=  1, 0, 0, 1          #是否�
 label_size,label_color =                            8, 'black'          #坐标轴字体大小和颜色
 #读取填充数据
 timelist=[15,20,21,23,25,28]                    #设置需要绘制的时间
-path='D:\Data\wrfout_d03_2016-07-21_00_00_00.nc'     #读取文件的路径
+path='E:/wrfout_d03_2016-07-21_00-00-00'     #读取文件的路径
 ncfile=nc.Dataset(path)     #这行别动
 x=getvar(ncfile,'lon')                          #x是经度，y是纬度，也可以自行修改
 y=getvar(ncfile,'lat')

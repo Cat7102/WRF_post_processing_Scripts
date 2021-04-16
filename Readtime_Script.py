@@ -16,7 +16,7 @@ def get_ncfile_time(ncfile):
     return timelist
 
 #仅需要修改一下文件的路径即可
-ncfile=nc.Dataset('D:\Data\wrfout_d03_2016-07-21_00_00_00.nc')
+ncfile=nc.Dataset('D:/wrfout_d01_2016-07-21_12-00-00_success')
 timelist=get_ncfile_time(ncfile=ncfile)
 for i in range(len(timelist)):
     print("["+str(i)+"]"+timelist[i])

@@ -5,7 +5,6 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeat
 import matplotlib.ticker as mticker
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import cmaps
 import matplotlib as mpl
 from matplotlib.font_manager import FontProperties
@@ -24,8 +23,11 @@ class Figure4wrf():
         plt.close('all')
         self.fig=plt.figure(figsize=(width,height),dpi=dpi)
 
-    def init_draw(self,ver_num,hor_num,cur_num,title,title_size,title_y):
-        self.axe=plt.subplot(ver_num,hor_num,cur_num,projection=ccrs.PlateCarree())
+    def init_draw(self,ver_num,hor_num,cur_num,title,title_size,title_y,geo_opt=0):
+        if geo_opt==0:
+            self.axe=plt.subplot(ver_num,hor_num,cur_num,projection=ccrs.PlateCarree())
+        if geo_opt==1:
+            self.axe = plt.subplot(ver_num, hor_num, cur_num)
         self.axe.set_title(Fontprocess.zhSimsun_enTNR(title),fontproperties=Simsun,fontsize=title_size,y=title_y)
         print("图片初始化完成")
 
@@ -40,68 +42,53 @@ class Figure4wrf():
         if lake_opt==1:
             print("不绘制湖泊")
 
-    def extent_draw(self,l_x,r_x,b_y,t_y,more,geo_opt):
-        if geo_opt==0:
-            self.axe.set_extent([l_x - more, r_x+more, b_y - more, t_y+more], crs=ccrs.PlateCarree())
-            print("绘制地理图")
-        if geo_opt==1:
-            self.axe.set_extent([l_x - more, r_x + more, b_y - more, t_y + more])
-            print("不绘制地理图")
+    def extent_draw(self,l_x,r_x,b_y,t_y,more):
+        self.axe.set_extent([l_x - more, r_x+more, b_y - more, t_y+more], crs=ccrs.PlateCarree())
+        print("绘制地理图")
+
 
     def gridline_draw(self,grid_linewidth,grid_color,grid_type,big_interval_x,big_interval_y,small_interval_x,small_interval_y,
-                      top_labels,bottom_labels,left_labels,right_labels,label_size,label_color,geo_opt,
-                      l_x,r_x,b_y,t_y):
-        if geo_opt==0:
-            # 绘制网格
-            gl = self.axe.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=grid_linewidth, color=grid_color, linestyle=grid_type)
-            # 可以控制坐标轴出现的位置，设置False表示隐藏,0表示显示
-            if top_labels==0: gl.top_labels = True
-            if top_labels==1: gl.top_labels = False
-            if bottom_labels==0: gl.bottom_labels = True
-            if bottom_labels==1: gl.bottom_labels = False
-            if right_labels==0: gl.right_labels = True
-            if right_labels==1: gl.right_labels = False
-            if left_labels==0: gl.left_labels = True
-            if left_labels==1: gl.left_labels = False
-            # 自定义给出x轴Locator的位置
-            gl.xlocator = mticker.FixedLocator(np.arange(l_x, r_x+big_interval_x, big_interval_x))
-            gl.ylocator = mticker.FixedLocator(np.arange(b_y, t_y+big_interval_y, big_interval_y))
-            gl.xformatter = LONGITUDE_FORMATTER
-            gl.yformatter = LATITUDE_FORMATTER
-            gl.xlabel_style = {'size': label_size, "color": label_color, "font": Times}
-            gl.ylabel_style = {'size': label_size, 'color': label_color, "font": Times}
-            # 下面的用于设置minor刻度，不需要就注释掉
-            self.axe.set_xticks(np.arange(l_x, r_x, small_interval_x), crs=ccrs.PlateCarree(), minor=True)
-            self.axe.set_yticks(np.arange(b_y, t_y, small_interval_y), crs=ccrs.PlateCarree(), minor=True)
-            plt.xticks([])
-            plt.yticks([])
-            print("绘制地理网格")
-        if geo_opt==1:
-            # 绘制网格
-            gl = self.axe.gridlines(draw_labels=True, linewidth=grid_linewidth, color=grid_color, linestyle=grid_type)
-            # 可以控制坐标轴出现的位置，设置False表示隐藏,0表示显示
-            if top_labels==0: gl.top_labels = True
-            if top_labels==1: gl.top_labels = False
-            if bottom_labels==0: gl.bottom_labels = True
-            if bottom_labels==1: gl.bottom_labels = False
-            if right_labels==0: gl.right_labels = True
-            if right_labels==1: gl.right_labels = False
-            if left_labels==0: gl.left_labels = True
-            if left_labels==1: gl.left_labels = False
-            # 自定义给出x轴Locator的位置
-            gl.xlocator = mticker.FixedLocator(np.arange(l_x, r_x+big_interval_x, big_interval_x))
-            gl.ylocator = mticker.FixedLocator(np.arange(b_y, t_y+big_interval_y, big_interval_y))
-            gl.xlabel_style = {'size': label_size, "color": label_color, "font": Times}
-            gl.ylabel_style = {'size': label_size, 'color': label_color, "font": Times}
-            # 下面的用于设置minor刻度，不需要就注释掉
-            axe_1.set_xticks(np.arange(l_x, r_x, small_interval_x), minor=True)
-            axe_1.set_yticks(np.arange(b_y, t_y, small_interval_y), minor=True)
-            plt.xticks([])
-            plt.yticks([])
-            print("绘制非地理网格")
+                      label_size,label_color,l_x,r_x,b_y,t_y,tick_length):
+        '''
+        废弃方法
+        # 可以控制坐标轴出现的位置，设置False表示隐藏,0表示显示
+        if top_labels==0: gl.top_labels = True
+        if top_labels==1: gl.top_labels = False
+        if bottom_labels==0: gl.bottom_labels = True
+        if bottom_labels==1: gl.bottom_labels = False
+        if right_labels==0: gl.right_labels = True
+        if right_labels==1: gl.right_labels = False
+        if left_labels==0: gl.left_labels = True
+        if left_labels==1: gl.left_labels = False
+        # 自定义给出x轴Locator的位置
+        gl.xlocator = mticker.FixedLocator(np.arange(l_x, r_x+big_interval_x, big_interval_x))
+        gl.ylocator = mticker.FixedLocator(np.arange(b_y, t_y+big_interval_y, big_interval_y))
+        gl.xformatter = LONGITUDE_FORMATTER
+        gl.yformatter = LATITUDE_FORMATTER
+        gl.xlabel_style = {"color": label_color, "font": Times}
+        gl.ylabel_style = {'size': label_size, 'color': label_color, "font": Times}
+        '''
+        # 绘制网格
+        gl = self.axe.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=grid_linewidth, color=grid_color,
+                                linestyle=grid_type)
+        gl.top_labels,gl.bottom_labels,gl.right_labels,gl.left_labels = False,False,False,False
+        self.axe.set_xticks(np.arange(l_x, r_x+big_interval_x, big_interval_x), crs=ccrs.PlateCarree())
+        self.axe.set_yticks(np.arange(b_y, t_y+big_interval_y, big_interval_y), crs=ccrs.PlateCarree())
+        self.axe.xaxis.set_major_formatter(LongitudeFormatter())
+        self.axe.yaxis.set_major_formatter(LatitudeFormatter())
+        # 下面的用于设置minor刻度，不需要就注释掉
+        self.axe.set_xticks(np.arange(l_x, r_x, small_interval_x), crs=ccrs.PlateCarree(), minor=True)
+        self.axe.set_yticks(np.arange(b_y, t_y, small_interval_y), crs=ccrs.PlateCarree(), minor=True)
+        self.axe.tick_params(labelcolor=label_color,length=tick_length)
+        labels = self.axe.get_xticklabels() + self.axe.get_yticklabels()
+        [label.set_fontproperties(FontProperties(fname="./font/Times.ttf",size=label_size)) for label in labels]
+        print("绘制地理网格")
 
-    def contourf_draw(self,x,y,factor,cmap,level):
-        self.contourf = self.axe.contourf(x, y, factor, levels=level, cmap=cmap)
+    def contourf_draw(self,x,y,factor,cmap,level,contourf_opt=0):
+        if contourf_opt==0:
+            self.contourf = self.axe.contourf(x, y, factor, levels=level, cmap=cmap)
+        if contourf_opt==1:
+            self.contourf = self.axe.contourf(x, y, factor, cmap=cmap)
         print("最大和最小的值分别是：")
         print(np.max(factor).values, np.min(factor).values)
         print("绘制填充")
@@ -115,16 +102,12 @@ class Figure4wrf():
             self.axe.clabel(contour, inline=False, fontsize=fontsize, colors=fontcolor, fmt=fontprecision)
         print("等高线绘制完毕")
 
-    def quiver_draw(self,x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha,geo_opt,
+    def quiver_draw(self,x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha,
                     quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size):
         x,y,ws1,ws2=x[::interval,::interval],y[::interval,::interval],ws1[::interval,::interval],ws2[::interval,::interval]
-        if geo_opt==0:
-            quiver = self.axe.quiver(x, y, ws1, ws2, pivot='mid',
-                                     width=quiver_width, scale=quiver_scale, color=quiver_color, headwidth=quiver_headwidth,alpha=alpha,
-                                     transform=ccrs.PlateCarree())
-        if geo_opt==1:
-            quiver = self.axe.quiver(x, y, ws1, ws2, pivot='mid',
-                                     width=quiver_width, scale=quiver_scale, color=quiver_color, headwidth=quiver_headwidth,alpha=alpha)
+        quiver = self.axe.quiver(x, y, ws1, ws2, pivot='mid',
+                                 width=quiver_width, scale=quiver_scale, color=quiver_color, headwidth=quiver_headwidth,alpha=alpha,
+                                 transform=ccrs.PlateCarree())
         if quiverkey_opt==0:
             # 绘制矢量箭头的图例
             self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, Fontprocess.zhSimsun_enTNR(quiverkey_text),
@@ -133,6 +116,10 @@ class Figure4wrf():
             self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, quiverkey_text,
                                labelpos='E', coordinates='axes', fontproperties={'size': quiverkey_size,'family':'Times New Roman'})
             '''
+
+    def streamplot_draw(self,xi,yi,height,uv,w,density,color,linewidth,arrowsize,arrowstyle):
+        self.axe.streamplot(xi, yi, uv, w, density=density,
+                            color=color, linewidth=linewidth, arrowsize=arrowsize,arrowstyle=arrowstyle)
 
     def colorbar_draw(self,rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,label_size,tick_size,rect_place,rect_more):
         if label_opt==0:
@@ -158,7 +145,7 @@ class Figure4wrf():
             cb.ax.tick_params(labelsize=tick_size)
             # 下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
             labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
-            [label.set_fontproperties(Times) for label in labels]
+            [label.set_fontproperties(FontProperties(fname="./font/Times.ttf",size=tick_size)) for label in labels]
 
     def adjust_subplot(self,wspace,hspace):
         plt.subplots_adjust(wspace=wspace, hspace=hspace)
