@@ -31,7 +31,6 @@ more=               0.2     #图片extent的余量
 grid_linewidth,grid_color,grid_type=                0.7, 'gray', ':'    #网格线宽，线颜色，线型（{'-', '--', '-.', ':', ''）
 big_interval_x,big_interval_y =                     2, 2            #x和y轴的大间隔
 small_interval_x,small_interval_y =                 0.2, 0.2            #x和y的小间隔，如果无需小间隔设置和大间隔相同即可
-top_labels,bottom_labels,left_labels,right_labels=  1, 0, 0, 1          #是否隐藏上下左右的坐标，1表示隐藏，0显示
 label_size,label_color =                            10, 'black'          #坐标轴字体大小和颜色
 tick_length=                                        8                   #坐标轴的高度
 #设置数据的变量，时间，高度
@@ -50,24 +49,33 @@ level2=np.arange(50, 100, 10)                                   #等高线最小
 contour_color,contour_width,contour_style="white",0.7,"solid"   #等高线颜色，宽度和种类（ 'solid', 'dashed', 'dashdot', 'dotted'）
 fontsize,fontcolor,fontlabel,fontprecision=6,"white",0,'%1.0f'  #字体的大小，颜色，是否分开轮廓线（0表示是，1表示否），精度（'%1.3f'表示小数点后3位）
 alpha=0.5                                                       #等高线的透明度，0~1之间
+
 #矢量箭头图数据
 interval=2                              #风速间隔多少网格点绘制
 windspeed_height=0                      #如果是10m高的风速，那么这个参数就随便写，不会有影响
-quiver_width,quiver_scale,quiver_color,quiver_headwidth=0.0018,150,'black',3    #箭头的线宽，大小（数字越大越小），颜色，箭头的宽度
-alpha2=0.7                               #箭头的透明度，0~1之间
+quiver_width,quiver_scale,quiver_color,quiver_headwidth=0.0018,60,'black',3    #箭头的线宽，大小（数字越大越小），颜色，箭头的宽度
+alpha2=1                               #箭头的透明度，0~1之间
 quiverkey_opt=0                         #是否显示quiverkey
 quiverkey_x,quiverkey_y=0.93,1.01       #quiverkey的相对位置，x和y
 quiverkey_ws,quiverkey_text,quiverkey_size=4,'4m/s',10   #quiverkey的标注风速，标注字体和字体大小
+color_quiver=1
+cmap=cmaps.amwg_blueyellowred
+ws_map=[(0,1),(1,2),(2,3),(3,100)]
+
 #色块图例数据
 label_opt=1                                     #是否采用自定义的色块位置，0表示是，1表示否
 rect_place,rect_more='left',0.2                 #设置空白子图的位置（bottom，top，right，left），数值表示空白多少，相对子图的比例
 rect1,rect2,rect3,rect4=0.2, 0.1, 0.6, 0.03     #色块图例的位置
 hv_opt='vertical'                               #图例垂直还是水平
+colorbar_extend='both'                          #colorbar是否带箭头，'neither'和'both'
 label_text='温度坐标(℃)'                        #图例写什么字
 c_label_size,c_tick_size=8,8                   #标签字体大小,刻度字体大小
+
 #图片保存数据
 time_str=str(Readtime.get_ncfile_time(nc.Dataset(path),timezone=8)[time_num])  #读取文件的绘图的时间,timezone是时区
 fig_path=str(time_str.replace(":","-"))+'.png'      #保存的文件名，如果需要自己修改则自行添加
+
+
 
 
 fig=Figure4wrf(fig_width,fig_height,fig_dpi)
@@ -116,10 +124,10 @@ except:
 fig.geo_draw(lake_opt,lake_linewidth,lake_linecolor,coastline_linewidth,coastline_color,precision)
 fig.extent_draw(l_x,r_x,b_y,t_y,more)
 fig.gridline_draw(grid_linewidth,grid_color,grid_type,big_interval_x,big_interval_y,small_interval_x,small_interval_y,label_size,label_color,l_x,r_x,b_y,t_y,tick_length)
-fig.contourf_draw(x,y,factor,cmap,level,contourf_opt)
+#fig.contourf_draw(x,y,factor,cmap,level,contourf_opt)
 #fig.contour_draw(x,y,factor2,level2,contour_color,contour_width,contour_style,fontsize,fontcolor,fontlabel,fontprecision,alpha)
-fig.quiver_draw(x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha2,quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size)
-fig.colorbar_draw(rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,c_label_size,c_tick_size,rect_place,rect_more)
+fig.quiver_draw(x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha2,quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size,color_quiver=color_quiver,color_maps=cmap,ws_map=ws_map)
+fig.colorbar_draw(rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,c_label_size,c_tick_size,rect_place,rect_more,colorbar_extend=colorbar_extend,ticks=ws_map,color_quiver=color_quiver)
 #fig.save_fig(fig_path)
 fig.fig_show()
 

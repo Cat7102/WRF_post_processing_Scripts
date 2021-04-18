@@ -10,6 +10,7 @@ import matplotlib as mpl
 from matplotlib.font_manager import FontProperties
 import Fontprocess
 import numpy as np
+from matplotlib.colors import Normalize
 Simsun = FontProperties(fname="./font/SimSun.ttf")
 Times = FontProperties(fname="./font/Times.ttf")
 mpl.rcParams['axes.unicode_minus']=False
@@ -103,49 +104,77 @@ class Figure4wrf():
         print("等高线绘制完毕")
 
     def quiver_draw(self,x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha,
-                    quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size):
-        x,y,ws1,ws2=x[::interval,::interval],y[::interval,::interval],ws1[::interval,::interval],ws2[::interval,::interval]
-        quiver = self.axe.quiver(x, y, ws1, ws2, pivot='mid',
-                                 width=quiver_width, scale=quiver_scale, color=quiver_color, headwidth=quiver_headwidth,alpha=alpha,
-                                 transform=ccrs.PlateCarree())
-        if quiverkey_opt==0:
-            # 绘制矢量箭头的图例
-            self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, Fontprocess.zhSimsun_enTNR(quiverkey_text),
-                               labelpos='E', coordinates='axes', fontproperties={'size': quiverkey_size,'family':'Times New Roman'})
-            '''
-            self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, quiverkey_text,
-                               labelpos='E', coordinates='axes', fontproperties={'size': quiverkey_size,'family':'Times New Roman'})
-            '''
+                    quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size,
+                    color_quiver=0,color_maps=None,ws_map=None):
+        x, y, ws1, ws2 = x[::interval,::interval], y[::interval,::interval], ws1[::interval,::interval], ws2[::interval,::interval]
+        if color_quiver==0:
+            quiver = self.axe.quiver(x, y, ws1, ws2, pivot='mid',
+                                     width=quiver_width, scale=quiver_scale, color=quiver_color, headwidth=quiver_headwidth,alpha=alpha,
+                                     transform=ccrs.PlateCarree())
+            if quiverkey_opt==0:
+                # 绘制矢量箭头的图例
+                self.axe.quiverkey(quiver, quiverkey_x, quiverkey_y, quiverkey_ws, Fontprocess.zhSimsun_enTNR(quiverkey_text),
+                                   labelpos='E', coordinates='axes', fontproperties={'size': quiverkey_size,'family':'Times New Roman'})
+        if color_quiver==1:
+            color_map=np.zeros_like(ws1,dtype=float)
+            windspeed=np.sqrt(ws1**2+ws2**2)
+            ws1=ws1/windspeed
+            ws2=ws2/windspeed
+            for i in range(len(ws_map)):
+                color_map[np.where((windspeed>ws_map[i][0]) & (windspeed<=ws_map[i][1]))]=i
+            norm=Normalize()
+            norm.autoscale(color_map)
 
+            self.quiver = self.axe.quiver(x, y, ws1, ws2, norm(color_map),cmap=color_maps, pivot='mid',
+                                     width=quiver_width, scale=quiver_scale,
+                                     headwidth=quiver_headwidth, alpha=alpha,
+                                     transform=ccrs.PlateCarree())
     def streamplot_draw(self,xi,yi,height,uv,w,density,color,linewidth,arrowsize,arrowstyle):
         self.axe.streamplot(xi, yi, uv, w, density=density,
                             color=color, linewidth=linewidth, arrowsize=arrowsize,arrowstyle=arrowstyle)
 
-    def colorbar_draw(self,rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,label_size,tick_size,rect_place,rect_more):
-        if label_opt==0:
-            if rect_place=='bottom':
-                self.fig.subplots_adjust(bottom=rect_more)
-            if rect_place=='top':
-                self.fig.subplots_adjust(top=rect_more)
-            if rect_place=='left':
-                self.fig.subplots_adjust(left=rect_more)
-            if rect_place=='right':
-                self.fig.subplots_adjust(right=rect_more)
-            rect = [rect1, rect2, rect3, rect4]  # 分别代表，水平位置，垂直位置，水平宽度，垂直宽度
-            cbar_ax = self.fig.add_axes(rect)
-            cb = self.fig.colorbar(self.contourf, cax=cbar_ax, orientation=hv_opt,spacing='proportional')  # orientation='vertical'
-            cb.set_label(Fontprocess.zhSimsun_enTNR(label_text),fontproperties=Simsun,fontsize=label_size)
-            cb.ax.tick_params(labelsize=tick_size)
-            #下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
-            labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
-            [label.set_fontproperties(Times) for label in labels]
-        if label_opt==1:
-            cb = self.fig.colorbar(self.contourf, orientation=hv_opt,spacing='proportional')  # orientation='vertical'
-            cb.set_label(Fontprocess.zhSimsun_enTNR(label_text),fontproperties=Simsun,fontsize=label_size)
+    def colorbar_draw(self,rect1,rect2,rect3,rect4,label_opt,hv_opt,label_text,label_size,tick_size,rect_place,rect_more,
+                      colorbar_extend='both',ticks=None,color_quiver=0):
+        if color_quiver==0:
+            if label_opt==0:
+                if rect_place=='bottom':
+                    self.fig.subplots_adjust(bottom=rect_more)
+                if rect_place=='top':
+                    self.fig.subplots_adjust(top=rect_more)
+                if rect_place=='left':
+                    self.fig.subplots_adjust(left=rect_more)
+                if rect_place=='right':
+                    self.fig.subplots_adjust(right=rect_more)
+                rect = [rect1, rect2, rect3, rect4]  # 分别代表，水平位置，垂直位置，水平宽度，垂直宽度
+                cbar_ax = self.fig.add_axes(rect)
+                cb = self.fig.colorbar(self.contourf, cax=cbar_ax, orientation=hv_opt,spacing='proportional',extend=colorbar_extend)  # orientation='vertical'
+                cb.set_label(Fontprocess.zhSimsun_enTNR(label_text),fontproperties=Simsun,fontsize=label_size)
+                cb.ax.tick_params(labelsize=tick_size)
+                #下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
+                labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
+                [label.set_fontproperties(Times) for label in labels]
+            if label_opt==1:
+                cb = self.fig.colorbar(self.contourf, orientation=hv_opt,spacing='proportional',extend=colorbar_extend)  # orientation='vertical'
+                cb.set_label(Fontprocess.zhSimsun_enTNR(label_text),fontproperties=Simsun,fontsize=label_size)
+                cb.ax.tick_params(labelsize=tick_size)
+                # 下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
+                labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
+                [label.set_fontproperties(FontProperties(fname="./font/Times.ttf",size=tick_size)) for label in labels]
+        if color_quiver==1:
+            bound=[]
+            for i in ticks:
+                bound.append(i[0])
+            ticks=np.array(bound)/bound[-1]
+            cb = self.fig.colorbar(self.quiver,ticks=ticks, orientation=hv_opt, spacing='proportional',extend=colorbar_extend)  # orientation='vertical'
+            if hv_opt=='vertical':
+                cb.ax.set_yticklabels(bound)
+            if hv_opt=='horizontal':
+                cb.ax.set_xticklabels(bound)
+            cb.set_label(Fontprocess.zhSimsun_enTNR(label_text), fontproperties=Simsun, fontsize=label_size)
             cb.ax.tick_params(labelsize=tick_size)
             # 下面两行是指定colorbar刻度字体的方法，绘图的坐标也同样适用
-            labels=cb.ax.get_xticklabels()+cb.ax.get_yticklabels()
-            [label.set_fontproperties(FontProperties(fname="./font/Times.ttf",size=tick_size)) for label in labels]
+            labels = cb.ax.get_xticklabels() + cb.ax.get_yticklabels()
+            [label.set_fontproperties(FontProperties(fname="./font/Times.ttf", size=tick_size)) for label in labels]
 
     def adjust_subplot(self,wspace,hspace):
         plt.subplots_adjust(wspace=wspace, hspace=hspace)
