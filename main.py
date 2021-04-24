@@ -36,6 +36,7 @@ tick_length=                                        8                   #坐标�
 #设置数据的变量，时间，高度
 path='D:/wrfout_d01_2016-07-21_12-00-00_success'     #读取文件的路径
 var_contourf, var_contour=     'o3','rh'    #填充的变量和绘制等高线的变量
+chem_w=                         48          #摩尔质量，如果无需摩尔质量输入-1
 var_u,var_v=                   'ua','va'    #风速的经度方向和纬度方向
 time_num=                       42          #时间的序号
 height_contourf, height_contour=0,0         #如果数据没有高度，那么随便填一个数字就行，不要空着
@@ -82,7 +83,8 @@ fig=Figure4wrf(fig_width,fig_height,fig_dpi)
 fig.init_draw(ver_num,hor_num,cur_num,title,title_size,title_y)
 ncfile=nc.Dataset(path)
 factor=getvar(ncfile,var_contourf,timeidx=time_num)
-factor=factor*1000*48/22.4
+if factor>0:
+    factor=factor*1000/22.4*chem_w*273.15/(getvar(ncfile,'tk',timeidx=time_num))
 factor2=getvar(ncfile,var_contour,timeidx=time_num)
 ws1=getvar(ncfile,var_u,timeidx=time_num)
 ws2=getvar(ncfile,var_v,timeidx=time_num)
