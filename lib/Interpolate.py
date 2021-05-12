@@ -4,6 +4,40 @@ from scipy.interpolate import Rbf
 import numpy as np
 import time
 
+def calculate_wind_direction_array(ua_array,va_array):
+    wdir_array = np.zeros_like(ua_array,dtype=float)
+    for i in range(ua_array.shape[0]):#由于tan只能生成-90~90°的角度，而风速角度是0~360，因此需要做处理。其中正北为0度，顺时针为正。
+        for j in range(ua_array.shape[1]):
+            if ua_array[i,j]>=0 and va_array[i,j]>0:#第三象限
+                wdir_array[i,j]=np.arctan(np.divide(ua_array[i,j],va_array[i,j]))*180/np.pi+180
+            elif ua_array[i,j]<0 and va_array[i,j]>0:#第二象限
+                wdir_array[i,j]=np.arctan(np.divide(ua_array[i,j],va_array[i,j]))*180/np.pi+180
+            elif ua_array[i,j]>0 and va_array[i,j]<0:#第四象限
+                wdir_array[i,j]=np.arctan(np.divide(ua_array[i,j],va_array[i,j]))*180/np.pi+360
+            elif ua_array[i,j]>0 and va_array[i,j]==0:
+                wdir_array[i,j]=270
+            elif ua_array[i,j]<0 and va_array[i,j]==0:
+                wdir_array[i,j]=90
+            else:
+                wdir_array[i,j]=np.arctan(np.divide(ua_array[i,j],va_array[i,j])) * 180/np.pi
+    return wdir_array
+
+def calculate_wind_direction(u,v):
+    wdir=None
+    if u>=0 and v>0:#第三象限
+        wdir=np.arctan(np.divide(u,v))*180/np.pi+180
+    elif u<0 and v>0:#第二象限
+        wdir=np.arctan(np.divide(u,v))*180/np.pi+180
+    elif u>0 and v<0:#第四象限
+        wdir=np.arctan(np.divide(u,v))*180/np.pi+360
+    elif u>0 and v==0:
+        wdir=270
+    elif u<0 and v==0:
+        wdir=90
+    else:
+        wdir=np.arctan(np.divide(u,v)) * 180/np.pi
+    return wdir
+
 def get_nearest_4points(ncfile,point_lat,point_lon):
     we,sn=to_np(ll_to_xy(ncfile,point_lat,point_lon))
     nearest_point=(to_np(getvar(ncfile,'lat'))[sn,we],to_np(getvar(ncfile,'lon'))[sn,we])
@@ -110,15 +144,3 @@ def interpolate_vert(ncfile,start_lat,end_lat,start_lon,end_lon,var,time,start_p
     lon_vert_list=np.mgrid[lon_vert_list[0]:lon_vert_list[-1]:complex(str(len(lon_vert_list)) + 'j')]
     return f_vert,lat_vert_list,lon_vert_list,p_vert_list,h_vert_list
 
-'''
-
-times=time.time()
-ncfile=nc.Dataset("D:/Data/wrfout_d03_2016-07-21_00_00_00.nc")
-u10=getvar(ncfile,"U10",timeidx=0)
-xi = np.mgrid[121:122:complex(str(40) + 'j')]
-a=interpolate_grid(ncfile,u10,[31.25],xi,0)
-print(a)
-timee=time.time()
-print('本次计算总时间为：')
-print(timee-times)
-'''

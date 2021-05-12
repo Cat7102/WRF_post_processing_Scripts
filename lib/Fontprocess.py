@@ -25,6 +25,8 @@ def zhSimsun_enTNR(string):
                 if char.isspace()==False:
                     if char=='\u2103':
                         str_ += '^{o}C'
+                    elif char=="%":
+                        str_ += '\%'
                     else:
                         str_ += char
             if judge==1:
@@ -33,6 +35,8 @@ def zhSimsun_enTNR(string):
                 if char.isspace()==False:
                     if char=='\u2103':
                         str_ += '^{o}C'
+                    elif char=="%":
+                        str_ += '\%'
                     else:
                         str_ += char
             if num==len(string)-1:

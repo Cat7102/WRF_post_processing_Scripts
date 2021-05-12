@@ -18,4 +18,5 @@ def get_ncfile_time(ncfile,timezone=0):
 def get_ncfile_alltime(ncfile):
     time = getvar(ncfile, 'xtimes', timeidx=ALL_TIMES) #这个输出的是分钟的时间
     print(int(time.shape[0]))
+    return int(time.shape[0])
 
