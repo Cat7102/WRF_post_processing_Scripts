@@ -49,7 +49,7 @@ class Figure4wrf():
 
 
     def gridline_draw(self,grid_linewidth,grid_color,grid_type,big_interval_x,big_interval_y,small_interval_x,small_interval_y,
-                      label_size,label_color,l_x,r_x,b_y,t_y,tick_length,xlabel,xlabelsize):
+                      label_size,label_color,l_x,r_x,b_y,t_y,tick_length,xlabel=None,xlabelsize=None):
         '''
         废弃方法
         # 可以控制坐标轴出现的位置，设置False表示隐藏,0表示显示
@@ -79,7 +79,12 @@ class Figure4wrf():
         self.axe.set_yticks(np.arange(b_y, t_y+big_interval_y/2, big_interval_y), crs=ccrs.PlateCarree())
         self.axe.xaxis.set_major_formatter(LongitudeFormatter())
         self.axe.yaxis.set_major_formatter(LatitudeFormatter())
-        plt.xlabel(xlabel,fontproperties=FontProperties(fname="./font/Times.ttf",size=xlabelsize))
+        try:
+            if xlabel == None:  # 如果ticks不为None，那么就会报错，然后就可以进入下面的设置ticks
+                print("xlabel为空")
+        except:
+            print("xlabel不为空")
+            plt.xlabel(xlabel,fontproperties=FontProperties(fname="./font/Times.ttf",size=xlabelsize))
         # 下面的用于设置minor刻度，不需要就注释掉
         self.axe.set_xticks(np.arange(l_x, r_x, small_interval_x), crs=ccrs.PlateCarree(), minor=True)
         self.axe.set_yticks(np.arange(b_y, t_y, small_interval_y), crs=ccrs.PlateCarree(), minor=True)

@@ -16,7 +16,8 @@ fig_height=     6   #图片高
 fig_dpi=        180 #图片DPI
 #图片的格式
 ver_num,hor_num=    2,2 #一张图片显示子图的行数，列数
-cur_num=            1   #第几个子图
+cur_num=            1   #第几个子图，用于标记
+title = "O_{3} and Wind"  # 子图的标题，如果需要循环作图建议放在下方循环内
 title_size=         8.5  #子图的标题
 title_y=            1.04    #标题的高度
 #地理信息
@@ -28,22 +29,22 @@ precision=                              '10m'   #精度，10m，50m和110m，要
 l_x,r_x,b_y,t_y=    120.8, 122.2, 30.6, 31.8    #图片显示范围，分别是左右下上
 more=               0.1     #图片extent的余量
 #网格属性
-grid_linewidth,grid_color,grid_type=                0, 'gray', ':'    #网格线宽，线颜色，线型（{'-', '--', '-.', ':', ''）
+grid_linewidth,grid_color,grid_type=                0, 'gray', ':'    #网格线宽（0表示无网格），线颜色，线型（{'-', '--', '-.', ':', ''）
 big_interval_x,big_interval_y =                     0.3, 0.3            #x和y轴的大间隔
 small_interval_x,small_interval_y =                 0.3, 0.3            #x和y的小间隔，如果无需小间隔设置和大间隔相同即可
 label_size,label_color =                            6, 'black'          #坐标轴字体大小和颜色
 tick_length=                                        6                   #坐标轴的高度
+xlabellist=['(a)','(b)','(c)','(d)']                                    #x坐标上要添加的东西，如果不需要那么把下面的字体大小改成0
+xlabelsize = 10                                                         #x坐标轴的字体大小
 #设置数据的变量，时间，高度
-#path='D:\\wrf_simulation\\final\\wrfout_d03_2016-07-21_12'     #读取文件的路径
 path='D:\wrf_simulation\\2meic\\wrfout_d03_2016-07-21_12_2meic'     #读取文件的路径
 var_contourf, var_contour=     'o3','rh'    #填充的变量和绘制等高线的变量
-chem_w=                         48          #摩尔质量，如果无需摩尔质量输入-1
+chem_w=                         48          #摩尔质量，如果无需摩尔质量输入小于等于0的数字
 var_u,var_v=                   'ua','va'    #风速的经度方向和纬度方向
-timelist=range(120,132,3)          #时间的序号
+timelist=range(120,132,3)                   #时间的列表，起始，重点，间隔多少
 height_contourf, height_contour=0,0         #如果数据没有高度，那么随便填一个数字就行，不要空着
 
 #读取填充数据
-#cmap=cmaps.amwg_blueyellowred                    #填色的颜色类型，具体参考colormap
 cmap=cmaps.NCV_jaisnd                    #填色的颜色类型，具体参考colormap
 contourf_opt=0                                   #是否使用默认填色,1表示是
 level=np.arange(120, 410, 10)                  #填色的最小值，最大值和间隔
@@ -51,10 +52,12 @@ ticks=np.arange(120, 410, 20)                    #设置colorbar的ticks，如�
 colorbar_extend='neither'                          #colorbar是否带箭头，'neither'和'both'
 
 #设置等高线数据
-level2=np.arange(50, 100, 10)                                   #等高线最小值，最大值和间隔
-contour_color,contour_width,contour_style="white",0.7,"solid"   #等高线颜色，宽度和种类（ 'solid', 'dashed', 'dashdot', 'dotted'）
-fontsize,fontcolor,fontlabel,fontprecision=6,"white",0,'%1.0f'  #字体的大小，颜色，是否分开轮廓线（0表示是，1表示否），精度（'%1.3f'表示小数点后3位）
-alpha=0.5                                                       #等高线的透明度，0~1之间
+level2=np.arange(30, 105, 5)                                   #等高线最小值，最大值和间隔
+contour_color,contour_width,contour_style="white",0.8,"solid"   #等高线颜色，宽度和种类（ 'solid', 'dashed', 'dashdot', 'dotted'）
+fontsize,fontcolor,fontlabel,fontprecision=0,"white",2,'%1.0f'  #字体的大小，颜色，是否分开轮廓线（0表示是，1表示否），精度（'%1.3f'表示小数点后3位）
+alpha=1                                                       #等高线的透明度，0~1之间
+contour_opt=0                                                   #0表示不用cmap，1表示用。如果用了1，那么colorbar会默认用contour的cmaps
+contour_cmaps=cmaps.seaice_2_r                          #contour用的cmap
 
 #矢量箭头图数据
 interval=3                              #风速间隔多少网格点绘制
@@ -64,9 +67,9 @@ alpha2=1                               #箭头的透明度，0~1之间
 quiverkey_opt=0                         #是否显示quiverkey
 quiverkey_x,quiverkey_y=0.87,1.03       #quiverkey的相对位置，x和y
 quiverkey_ws,quiverkey_text,quiverkey_size=4,'4m/s',7   #quiverkey的标注风速，标注字体和字体大小
-color_quiver=0
-cmap_quiver=cmaps.amwg_blueyellowred
-ws_map=[(0,1),(1,2),(2,3),(3,100)]
+color_quiver=0                          #这个与cmap_quiver以及ws_map共用，如果需要用颜色来表示风速箭头，那么这里改成1
+cmap_quiver=cmaps.amwg_blueyellowred    #quiver的cmap
+ws_map=[(0,1),(1,2),(2,3),(3,100)]      #风速cmap对应的几档风速变色
 
 #色块图例数据
 label_opt=0                                     #是否采用自定义的色块位置，0表示是，1表示否
@@ -81,21 +84,21 @@ colorbar_ticklength=0                           #colorbar的tick突出长度，�
 #图片保存数据
 #time_str=str(Readtime.get_ncfile_time(nc.Dataset(path),timezone=8)[time_num])  #读取文件的绘图的时间,timezone是时区
 #fig_path=str(time_str.replace(":","-"))+'.png'      #保存的文件名，如果需要自己修改则自行添加
-fig_path="图5_o3.png"
-save_dpi=500
+fig_path="图1.png"
+save_dpi=500            #设置了保存图片的DPI值
 
-wspace,hspace=0.25,0.4
+#调整子图间距
+wspace,hspace=0.25,0.4  #设置了子图的横向间距和纵向间距
 
 
 
 ncfile=nc.Dataset(path)
 fig = Figure4wrf(fig_width, fig_height, fig_dpi)
-xlabellist=['(a)','(b)','(c)','(d)']
 for cur_num in range(ver_num*hor_num):
     i=timelist[cur_num]
     title=i
     #数据修改在下面
-    factor=getvar(ncfile,var_contourf,timeidx=i)           #需要绘制填色的变量
+    factor=getvar(ncfile,var_contourf,timeidx=i)  #如果是华氏度之类的物理量需要换算，可以自行进行修改factor的值
     if chem_w > 0:
         factor = factor * 1000 / 22.4 * chem_w * 273.15 / (getvar(ncfile, 'tk', timeidx=i)) * (getvar(ncfile, 'pressure', timeidx=i)) / 1013.25
     factor2=getvar(ncfile,var_contour,timeidx=i)
@@ -127,10 +130,10 @@ for cur_num in range(ver_num*hor_num):
         print('风速2存在高度')
     except:
         print("风速2不存在高度")
-    #修改一些图纸信息
+    xlabel = xlabellist[cur_num]
+
+    #这里的title可以进行修改
     title = str(Readtime.get_ncfile_time(ncfile,timezone=8)[i])+"  O_{3} and Wind"  # 每个子图的标题
-    xlabel=xlabellist[cur_num]
-    xlabelsize=10
 
     fig.init_draw(ver_num,hor_num,cur_num+1,title,title_size,title_y)
     #下面是执行函数部分，如果不需要某功能则可以注释，下面做简略介绍：
@@ -144,11 +147,12 @@ for cur_num in range(ver_num*hor_num):
     #   fig_show：展示图片
     fig.geo_draw(lake_opt, lake_linewidth, lake_linecolor, coastline_linewidth, coastline_color, precision)
     fig.extent_draw(l_x, r_x, b_y, t_y, more)
-    fig.gridline_draw(grid_linewidth, grid_color, grid_type, big_interval_x, big_interval_y, small_interval_x,small_interval_y, label_size, label_color, l_x, r_x, b_y, t_y, tick_length,xlabel,xlabelsize)
+    fig.gridline_draw(grid_linewidth, grid_color, grid_type, big_interval_x, big_interval_y, small_interval_x,small_interval_y, label_size, label_color, l_x, r_x, b_y, t_y, tick_length,xlabel=xlabel,xlabelsize=xlabelsize)
     fig.contourf_draw(x, y, factor, cmap, level, contourf_opt=contourf_opt,extend=colorbar_extend,)
     # fig.contour_draw(x,y,factor2,level2,contour_color,contour_width,contour_style,fontsize,fontcolor,fontlabel,fontprecision,alpha)
     fig.quiver_draw(x, y, ws1, ws2, interval, quiver_width, quiver_scale, quiver_color, quiver_headwidth, alpha2,quiverkey_opt, quiverkey_x, quiverkey_y, quiverkey_ws, quiverkey_text, quiverkey_size,color_quiver=color_quiver, color_maps=cmap_quiver, ws_map=ws_map)
 
+#由于此处colorbar是绘制一个统一的，因此放在循环外部
 fig.colorbar_draw(rect1, rect2, rect3, rect4, label_opt, hv_opt, label_text, c_label_size, c_tick_size, rect_place,rect_more, ticks=ticks, color_quiver=color_quiver,drawedges_bool=drawedges_bool,colorbar_ticklength=colorbar_ticklength)
 fig.adjust_subplot(wspace,hspace)
 fig.save_fig(fig_path,save_dpi=save_dpi)
