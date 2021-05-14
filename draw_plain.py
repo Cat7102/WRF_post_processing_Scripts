@@ -1,11 +1,9 @@
 import netCDF4 as nc
-import xarray as xr
 import numpy as np
 import cmaps
-from wrf import getvar, to_np, ALL_TIMES
+from wrf import getvar, to_np
 import sys
 sys.path.append("lib")
-import Fontprocess
 from Geo_Draw import Figure4wrf
 import Readtime
 
