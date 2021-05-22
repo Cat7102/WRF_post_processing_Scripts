@@ -99,6 +99,7 @@ for cur_num in range(ver_num*hor_num):
     wa = getvar(ncfile, 'wa', timeidx=i)
     wa = wa * 10
     p = getvar(ncfile, 'pressure', timeidx=i)
+    f_vert = vertcross(factor, p, wrfin=ncfile, start_point=startpoint, end_point=endpoint, latlon=True)
     ua_vert = vertcross(ua, p, wrfin=ncfile, start_point=startpoint, end_point=endpoint, latlon=True)
     va_vert = vertcross(va, p, wrfin=ncfile, start_point=startpoint, end_point=endpoint, latlon=True)
     wa_vert = vertcross(wa, p, wrfin=ncfile, start_point=startpoint, end_point=endpoint, latlon=True)
@@ -136,7 +137,7 @@ for cur_num in range(ver_num*hor_num):
     #   fig_show：展示图片
     fig.extent_draw(start_lon, end_lon, small_p, big_p)
     fig.gridline_draw(grid_linewidth, grid_color, grid_type, float_lonlist, str_lonlist, ticks_size,ticks_color,small_p, big_p, big_interval_p, tick_length,ylabel=ylabel,xaxis_show=xaxis_show,ylabelsize=ylabelsize, xlabel=xlabel, xlabelsize=xlabelsize)
-    fig.contourf_draw(path,startpoint,endpoint,lonlist,p,plist,factor,cmap,level,extend=colorbar_extend)
+    fig.contourf_draw(lonlist,plist,f_vert,cmap,level,extend=colorbar_extend)
     fig.quiver_draw(ua_vert,va_vert,wa_vert,lonlist,plist,interval,interval_y,start_lat,end_lat,start_lon,end_lon,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha)
 
 #由于此处colorbar是绘制一个统一的，因此放在循环外部

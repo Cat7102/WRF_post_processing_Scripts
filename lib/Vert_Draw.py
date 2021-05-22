@@ -1,11 +1,10 @@
 #代码库，不要修改
 
 import netCDF4 as nc
-from wrf import getvar,ll_to_xy,to_np,vertcross,CoordPair,interplevel
+from wrf import to_np
 import cartopy.crs as ccrs
 import cartopy.feature as cfeat
 import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
 import cmaps
 import matplotlib as mpl
 from matplotlib.font_manager import FontProperties
@@ -54,9 +53,7 @@ class Figure4wrf():
             plt.xlabel(xlabel,fontproperties=FontProperties(fname="./font/Times.ttf",size=xlabelsize))
         print("绘制网格")
 
-    def contourf_draw(self,path,startpoint,endpoint,lonlist,p,plist,f,cmap,level,extend="neither"):
-        ncfile=nc.Dataset(path)
-        f_vert = vertcross(f, p, wrfin=ncfile, start_point=startpoint, end_point=endpoint, latlon=True)
+    def contourf_draw(self,lonlist,plist,f_vert,cmap,level,extend="neither"):
         self.contourf = self.axe.contourf(lonlist, plist, f_vert, levels=level, cmap=cmap,extend=extend)
         print("绘制填充")
 
