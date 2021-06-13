@@ -5,6 +5,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeat
 import matplotlib.ticker as mticker
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import cmaps
 import matplotlib as mpl
 from matplotlib.font_manager import FontProperties
@@ -121,7 +122,7 @@ class Figure4wrf():
 
     def quiver_draw(self,x,y,ws1,ws2,interval,quiver_width,quiver_scale,quiver_color,quiver_headwidth,alpha,
                     quiverkey_opt,quiverkey_x,quiverkey_y,quiverkey_ws,quiverkey_text,quiverkey_size,
-                    color_quiver=0,color_maps=None,ws_map=None,extend="neither"):
+                    color_quiver=0,color_maps=None,ws_map=None):
         x, y, ws1, ws2 = x[::interval,::interval], y[::interval,::interval], ws1[::interval,::interval], ws2[::interval,::interval]
         if color_quiver==0:
             quiver = self.axe.quiver(x, y, ws1, ws2, pivot='mid',
@@ -143,8 +144,9 @@ class Figure4wrf():
 
             self.quiver = self.axe.quiver(x, y, ws1, ws2, norm(color_map),cmap=color_maps, pivot='mid',
                                      width=quiver_width, scale=quiver_scale,
-                                     headwidth=quiver_headwidth, alpha=alpha,extend=extend,
+                                     headwidth=quiver_headwidth, alpha=alpha,
                                      transform=ccrs.PlateCarree())
+
     def streamplot_draw(self,xi,yi,height,uv,w,density,color,linewidth,arrowsize,arrowstyle):
         self.axe.streamplot(xi, yi, uv, w, density=density,
                             color=color, linewidth=linewidth, arrowsize=arrowsize,arrowstyle=arrowstyle)
